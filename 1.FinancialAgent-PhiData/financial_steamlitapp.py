@@ -4,6 +4,9 @@ from phi.model.groq import Groq
 from phi.tools.yfinance import YFinanceTools
 from phi.tools.duckduckgo import DuckDuckGo
 from dotenv import load_dotenv
+from phi.workflow import  RunResponse
+from phi.utils.pprint import pprint_run_response
+from collections.abc import Iterator
 
 # Load environment variables
 load_dotenv()
@@ -17,6 +20,7 @@ websearch_agent = Agent(
     instructions=["Always include the sources"],
     show_tool_calls=True,
     markdown=True,
+    debug=True,
 )
 
 financial_agent = Agent(
@@ -34,6 +38,7 @@ financial_agent = Agent(
     instructions=["Use tables to display the data"],
     show_tool_calls=True,
     markdown=True,
+    debug=True,
 )
 
 multi_ai_agent = Agent(
@@ -42,6 +47,7 @@ multi_ai_agent = Agent(
     instructions=["Always include sources", "Use tables to display data"],
     show_tool_calls=True,
     markdown=True,
+    debug=True,
 )
 
 # Streamlit App
@@ -74,11 +80,14 @@ if st.button("Submit"):
                 elif selected_agent == "Financial Agent":
                     response = financial_agent.print_response(query, stream=True)
                 elif selected_agent == "Multi-Agent":
-                    response = multi_ai_agent.print_response(query, stream=True)
+                    # response = multi_ai_agent.print_response(query, stream=True)
+                    report_stream: Iterator[RunResponse] = multi_ai_agent.run(query)
 
                 # Display the response
+                pprint_run_response(report_stream, markdown=True)
                 st.header("Response")
-                st.markdown(response)
+                st.markdown(report_stream)
+                
 
             except Exception as e:
                 st.error(f"Error: {e}")
