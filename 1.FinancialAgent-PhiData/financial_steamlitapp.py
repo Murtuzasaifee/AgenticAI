@@ -8,6 +8,7 @@ from phi.workflow import  RunResponse
 from phi.utils.pprint import pprint_run_response
 from collections.abc import Iterator
 from collections import defaultdict
+import yfinance as yf
 
 # Load environment variables
 load_dotenv()
@@ -72,6 +73,10 @@ query = st.text_input("Enter your query:")
 
 # Process the query based on the selected agent
 if st.button("Submit"):
+    
+    st.header("Company Info")
+    st.write(yf.Ticker("TSLA").info.get('longBusinessSummary', 'No description available.'))
+                
     if query.strip() == "":
         st.error("Please enter a query.")
     else:
@@ -89,6 +94,7 @@ if st.button("Submit"):
 
                 # Display the response
                 pprint_run_response(report_stream, markdown=True)
+                
                 st.header("Response")
                 st.markdown(report_stream)
                 
