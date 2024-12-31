@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from phi.workflow import  RunResponse
 from phi.utils.pprint import pprint_run_response
 from collections.abc import Iterator
+from collections import defaultdict
 
 # Load environment variables
 load_dotenv()
@@ -68,6 +69,7 @@ selected_agent = st.sidebar.radio("Choose an agent", agent_options)
 st.header("Input")
 query = st.text_input("Enter your query:")
 
+
 # Process the query based on the selected agent
 if st.button("Submit"):
     if query.strip() == "":
@@ -76,9 +78,11 @@ if st.button("Submit"):
         with st.spinner("Processing..."):
             try:
                 if selected_agent == "Web Search Agent":
-                    response = websearch_agent.print_response(query, stream=True)
+                    # response = websearch_agent.print_response(query, stream=True)
+                     report_stream: Iterator[RunResponse] = websearch_agent.run(query)
                 elif selected_agent == "Financial Agent":
-                    response = financial_agent.print_response(query, stream=True)
+                    # response = financial_agent.print_response(query, stream=True)
+                     report_stream: Iterator[RunResponse] = financial_agent.run(query)
                 elif selected_agent == "Multi-Agent":
                     # response = multi_ai_agent.print_response(query, stream=True)
                     report_stream: Iterator[RunResponse] = multi_ai_agent.run(query)
